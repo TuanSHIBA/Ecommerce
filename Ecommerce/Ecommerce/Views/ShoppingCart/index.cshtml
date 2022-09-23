@@ -1,0 +1,170 @@
+﻿@using Ecommerce.ViewModel;
+@model List<CartItem>
+@{
+    ViewData["Title"] = "index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main class="main-content">
+    <div class="breadcrumb-area breadcrumb-height" data-bg-image="assets/images/breadcrumb/bg/1-1-1920x373.jpg">
+        <div class="container h-100">
+            <div class="row h-100">
+                <div class="col-lg-12">
+                    <div class="breadcrumb-item">
+                        <h2 class="breadcrumb-heading">Product Related</h2>
+                        <ul>
+                            <li>
+                                <a href="\home\index">Trang Chủ <i class="pe-7s-angle-right"></i></a>
+                            </li>
+                            <li>Cart</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="cart-area section-space-y-axis-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        <form action="javascript:void(0)">
+                            <div class="table-content table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th class="product_remove">Xóa</th>
+                                            <th class="product-thumbnail">Ảnh Đại Diện</th>
+                                            <th class="cart-product-name">Sản Phẩm</th>
+                                            <th class="product-price">Đơn Giá</th>
+                                            <th class="product-quantity">Số Lượng</th>
+                                            <th class="product-subtotal">Thành Tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model != null && Model.Count > 0)
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="product_remove">
+                                                        <a href="javascript:void(0)">
+                                                            <input type="button" value="X" class="removecart btn btn-primary" data-mahh="@item.product.ProductID" />
+                                                        </a>
+                                                    </td>
+                                                    <td class="product-thumbnail">
+                                                        <a href="javascript:void(0)">
+                                                            <img src="~/images/products/@item.product.Thumb" alt="@item.product.Title" style="width:10rem">
+                                                        </a>
+                                                    </td>
+                                                    <td class="product-name"><a href="javascript:void(0)">@item.product.ProductName</a></td>
+                                                    <td class="product-price"><span class="amount">@item.product.Price.ToString("#,##0") VNĐ</span></td>
+                                                    <td class="quantity">
+                                                        <div class="cart-plus-minus">
+                                                            <input data-mahh="@item.product.ProductID" data-dongia="@item.product.Price" class="cartItem cart-plus-minus-box" value="@item.amount" min="1" type="number" >
+                                                        </div>
+                                                    </td>
+                                                    <td class="product-subtotal"><span class="amount">@item.TotalMoney.ToString("#,##0") VNĐ</span></td>
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="coupon-all">
+                                        <div class="coupon">
+                                            <input id="coupon_code" class="input-text" name="coupon_code" value="" placeholder="Coupon code" type="text">
+                                            <input class="button mt-xxs-30" name="apply_coupon" value="Apply coupon" type="submit">
+                                        </div>
+                                        <div class="coupon2">
+                                            <input class="button" name="update_cart" value="Update cart" type="submit">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5 ml-auto">
+                                    <div class="cart-page-total">
+                                        <h2>Tổng Đơn Hàng</h2>
+                                        <ul>
+                                            <li>Thành tiền <span>@Model.Sum(x => x.TotalMoney).ToString("#,##0") VNĐ</span></li>
+                                        </ul>
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                        <a href="/checkout.html">Thanh Toán</a>
+                                        }
+                                        else
+                                        {
+                                         <a href="/dang-nhap.html?returnUrl=/checkout.html">Thanh Toán </a>
+                                         }
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                                        else
+                                        {
+                        <h2 style="text-align:center"> Không có sản phẩm trong giỏ hàng</h2>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+@section Scripts{
+    <script>
+        $(function () {
+            function loadHeaderCart()
+                    {
+                         $('#miniCart').load("/AjaxContent/HeaderCart");
+                         $("#numberCart").load("/AjaxContent/NumberCart");
+                     }
+        $(".removecart").click(function ()
+            {
+            var productid = $(".removecart").attr("data-mahh");
+                 $.ajax({
+                    url: "api/cart/remove",
+                    type: "POST",
+                    dataType: "JSON",
+                     data: { productID: productid },
+                    success: function (result) {
+                        if (result.success) {
+                            loadHeaderCart();
+                            window.location = 'cart.html';
+                        }
+                    },
+                    error: function (rs) {
+                        alert("Xóa giỏ hàng lỗi !");
+                    }
+            });
+            });
+
+        $(".cartItem").click(function () {
+                var productid = $(this).attr("data-mahh");
+                var soluong = parseInt($(this).val());
+                $.ajax({
+                    url: "api/cart/update",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        productID: productid,
+                        amount: soluong
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            loadHeaderCart();
+                            window.location = 'cart.html';
+                        }
+                    },
+                    error: function (rs) {
+                        alert("Cập nhật giỏ hàng lỗi !");
+                    }
+                });
+            });
+        });
+    </script>
+}

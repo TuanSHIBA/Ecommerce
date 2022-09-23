@@ -1,0 +1,117 @@
+﻿@model IEnumerable<Ecommerce.Entities.Product>
+
+@{
+    ViewData["Title"] = "Sản Phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="/admin/home" class="breadcrumb-item"><i class="anticon anticon-home m-r-5"></i>Home</a>
+            <a class="breadcrumb-item" href="#">Danh Sách Sản Phẩm</a>
+        </nav>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row m-b-30">
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-affix m-v-10">
+                            <i class="prefix-icon anticon anticon-search opcacity-04"></i>
+                            <input type="text" class="form-control" placeholder="Search" id="keyword" name="keyword" />
+                        </div>
+                    </div>                       
+                    <div class="col-md-6">
+                        <div class="input-affix m-v-10">
+                            <select class="custom-select" style="min-width: 200px" id="cateId" name="cateId" asp-items="@ViewBag.DanhMuc">
+                                <option selected value="0">Chọn Danh Mục</option>
+                            </select> 
+                       </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-right">
+                <a class="btn btn-primary" href="/admin/adminproducts/create">
+                    <i class="anticon anticon-plus-circle m-r-5"></i>
+                    <span>Add Product</span>
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover e-commerce-table">
+                <thead>
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Danh Mục</th>
+                        <th>Giá </th>
+                        <th>Tồn Kho</th>
+                        <th>Trạng Thái</th>
+
+                    </tr>
+                </thead>
+                <tbody id="records_table">
+                    @if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.ProductID
+                                </td>
+                                <td>@item.ProductName</td>
+                                <td>@item.Category.CateName</td>
+                                <td>@item.Price.ToString("#,##0") VND</td>
+                                <td>@item.UnitsInStock</td>
+                                <td>
+                                    @if (item.UnitsInStock > 0)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <div class="badge badge-success badge-dot m-r-10">
+
+                                            </div>
+                                            <div> In Stock</div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <div class="badge badge-success badge-dot m-r-10">
+
+                                            </div>
+                                            <div> Out Stock</div>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminProducts" asp-action="Details" asp-route-id="@item.ProductID"> View</a>
+                                    <a class="btn btn-secondary btn-tone m-r-5" asp-area="Admin" asp-controller="AdminProducts" asp-action="Edit" asp-route-id="@item.ProductID"> Edit</a>
+                                    <a class="btn btn-success btn-tone m-r-5" asp-area="Admin" asp-controller="AdminProducts" asp-action="Delete" asp-route-id="@item.ProductID"> Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="/admin/adminProducts/?pagenum=@ViewBag.previous_page&cateid=@ViewBag.cateid"><<</a></li>
+                    <li class="page-item"><a class="page-link" href="/admin/adminProducts/?pagenum=1&cateid=@ViewBag.cateid">1</a></li>
+                    <li class="page-item"><a class="page-link" href="/admin/adminProducts/?pagenum=2&cateid=@ViewBag.cateid">2</a></li>
+                    <li class="page-item"><a class="page-link" href="/admin/adminProducts/?pagenum=3&cateid=@ViewBag.cateid">3</a></li>
+                    <li class="page-item"><a class="page-link" href="/admin/adminProducts/?pagenum=@ViewBag.NextPage&cateid=@ViewBag.cateid">>></a></li>
+                </ul>
+            </nav>
+            <p style="color:black">Total Page : <b>@ViewData["TotalPage"]</b></p>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/MyJquery/Filter_Product.js"></script>
+ }

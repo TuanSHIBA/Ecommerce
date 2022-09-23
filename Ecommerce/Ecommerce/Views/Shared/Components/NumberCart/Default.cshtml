@@ -1,0 +1,18 @@
+﻿@model List<Ecommerce.ViewModel.CartItem>
+@if (Model != null && Model.Count() > 0)
+{
+    
+        <a href="#miniCart" class="minicart-btn toolbar-btn">
+            <i class="pe-7s-shopbag"></i>
+            <span class="quantity">@Model.Count()</span>
+        </a>
+    <div class="global-overlay"></div>
+    }
+    else
+    { 
+        <a href="#" class=" toolbar-btn">
+            <i class="pe-7s-shopbag"></i>
+            <span class="quantity">0</span>
+        </a>
+  
+}
